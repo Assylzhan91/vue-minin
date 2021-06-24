@@ -1,0 +1,5 @@
+@each $prop, $val in $colors {
+  .c-text-#{$prop} {
+    color: $val !important;
+  }
+}

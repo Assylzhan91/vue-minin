@@ -1,0 +1,8 @@
+@each $prop, $val in $cursors {
+  .cursor-#{$prop} {
+    @if $prop == 'n-a'{
+      opacity: .65;
+    }
+    cursor: $val !important;
+  }
+}
