@@ -23,8 +23,10 @@
 						</button>
 				</form>
 				<ul>
-					<li v-for="(person, id) of persons" :key="id">
-						<strong>{{ person.name }}</strong> - <b>{{ person.age }}</b>
+					<li v-for="(item, id) of persons" :key="id">
+						<strong>{{ item.person.name }}</strong> - <b>{{ item.person.age }}</b>
+						<button class="m-4 btn btn-danger" @click="removeElem(item.id)">
+							Delete</button>
 					</li>
 				</ul>
 			</div>
@@ -50,12 +52,21 @@ export default  {
 		fetch('https://vue-http-481d2-default-rtdb.asia-southeast1.firebasedatabase.app/user.json')
 			.then(response => response.json())
 			.then(data => {
-        this.persons = Object.values(data);
+			  console.log(data)
+        let obj = {};
+			  if(data !== null){
+          Object.entries(data).map((item, idx)=> {
+            this.persons[idx] = obj
+            this.persons[idx].id = item[0]
+            this.persons[idx].person = item[1]
+          })
+          console.log(this.persons)
+			  }
         this.showBlock = true
-			})
+      })
 			.catch(error => {
 			  console.log(error)
-        this.errorBlock = true
+        // this.errorBlock = true
 			})
 
   },
@@ -70,10 +81,22 @@ export default  {
           age: this.age,
 				})
       };
+      console.log(requestOptions);
       const response =  await fetch(this.urlUsers, requestOptions);
       await response.json();
       this.showBlock = true;
-		}
+		},
+
+    async removeElem (id) {
+      const requestOptions = {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" }
+      };
+      const response = await fetch(this.urlUsers, requestOptions);
+      console.log(response)
+      const data = await response.json();
+		},
+
 	},
 	computed: {
     getLengthName() {
