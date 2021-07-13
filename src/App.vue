@@ -22,12 +22,13 @@
 							Create a person
 						</button>
 				</form>
-				<ul>
-					<li v-for="(person, id) of persons" :key="id">
-						<strong>{{ person.name }}</strong> - <b>{{ person.age }}</b>
-					</li>
-				</ul>
+				<people-list
+					:list="peopleList"
+					textError="Not any person"
+					@load="loadPersons"
+				/>
 			</div>
+			{{ persons }}
 			<div v-if="errorBlock">
 				<h1>Error</h1>
 			</div>
@@ -35,29 +36,25 @@
   </div>
 </template>
 <script>
+
+import PeopleList from './views/PeopleList';
+import { users } from './assets/js/urlList';
+
 export default  {
+  components: {
+    PeopleList
+	},
   data () {
     return {
       name: '',
       age: '',
-			persons: [],
+			peopleList: [],
 			showBlock: false,
       errorBlock: false,
-			urlUsers: 'https://vue-http-481d2-default-rtdb.asia-southeast1.firebasedatabase.app/user.json',
 		}
 	},
   created() {
-		fetch('https://vue-http-481d2-default-rtdb.asia-southeast1.firebasedatabase.app/user.json')
-			.then(response => response.json())
-			.then(data => {
-        this.persons = Object.values(data);
-        this.showBlock = true
-			})
-			.catch(error => {
-			  console.log(error)
-        this.errorBlock = true
-			})
-
+		this.loadedPersons();
   },
   methods: {
     async createPerson (e) {
@@ -70,10 +67,31 @@ export default  {
           age: this.age,
 				})
       };
-      const response =  await fetch(this.urlUsers, requestOptions);
+      const response =  await fetch(users + '.json', requestOptions);
       await response.json();
+      this.loadedPersons();
       this.showBlock = true;
-		}
+		},
+    loadPersons () {
+      console.log('loadPerson');
+		},
+		loadedPersons () {
+      fetch(users + '.json')
+        .then(response => response.json())
+        .then(data => {
+          Object.entries(data).forEach((item, idx)=>{
+            this.peopleList[idx] = {}
+            this.peopleList[idx].id = item[0]
+            this.peopleList[idx].person = item[1]
+          })
+          this.showBlock = true
+        })
+        .catch(error => {
+          console.log(error)
+          this.showBlock = true
+        })
+
+    }
 	},
 	computed: {
     getLengthName() {
