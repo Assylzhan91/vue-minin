@@ -2,7 +2,7 @@
 	<div style="display: inline-block">
 		<button
 			class="btn" :class="setStyleBtn"
-			@click="$emit('delete')"
+			@click="$emit('handler')"
 		>
 			{{text}}</button>
 	</div>
@@ -18,7 +18,7 @@ export default {
 		},
     styleBtn: {
       type: String
-		}
+		},
 	},
 	computed: {
     setStyleBtn() {

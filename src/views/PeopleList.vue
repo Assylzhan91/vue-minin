@@ -1,12 +1,13 @@
 <template>
 	<ul v-if="list.length">
 		<li v-for="(item) of list" :key="item.id">
-			<strong>{{ item.person.name }}</strong> - <b>{{ item.person.age }}</b>
+			<strong>{{ item.name }}</strong> - <b>{{ item.age }}</b>
 			<v-button
 				text="Delete"
 				styleBtn="primary"
 				class="ms-sm-4"
-				@delete="deleteElem(item.id)"
+				clickHandler="delete"
+				@handler="deleteElem(item.id)"
 			/>
 		</li>
 	</ul>
@@ -26,6 +27,7 @@
 import ErrorComponent from '../components/ErrorComponent';
 import VButton from '../components/VButton';
 import { users } from '../assets/js/urlList';
+
 export default {
   name: "PeopleList",
 	components: {

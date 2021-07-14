@@ -13,14 +13,13 @@
 						<input class="form-control" type="text" id="age" v-model.trim="age">
 						<h1>{{ age }}</h1>
 					</div>
-						<button
-							type="submit"
-							class="btn btn-primary"
-							:class="getLengthName"
-							:disabled="name.length < 4 || age.length <= 1"
-						>
-							Create a person
-						</button>
+					<v-button
+						text="Create a person"
+						styleBtn="success"
+						:class="getLengthName"
+						:disabled="name.length < 4 || age.length <= 1"
+						@handler="createPerson"
+					/>
 				</form>
 				<people-list
 					:list="peopleList"
@@ -28,7 +27,6 @@
 					@load="loadPersons"
 				/>
 			</div>
-			{{ persons }}
 			<div v-if="errorBlock">
 				<h1>Error</h1>
 			</div>
@@ -38,11 +36,14 @@
 <script>
 
 import PeopleList from './views/PeopleList';
+import VButton from './components/VButton';
 import { users } from './assets/js/urlList';
+import axios from 'axios';
 
 export default  {
   components: {
-    PeopleList
+    PeopleList,
+    VButton
 	},
   data () {
     return {
@@ -75,22 +76,17 @@ export default  {
     loadPersons () {
       console.log('loadPerson');
 		},
-		loadedPersons () {
-      fetch(users + '.json')
-        .then(response => response.json())
-        .then(data => {
-          Object.entries(data).forEach((item, idx)=>{
-            this.peopleList[idx] = {}
-            this.peopleList[idx].id = item[0]
-            this.peopleList[idx].person = item[1]
-          })
-          this.showBlock = true
-        })
-        .catch(error => {
-          console.log(error)
-          this.showBlock = true
-        })
-
+		async loadedPersons () {
+      const { data } = await axios.get(users + '.json');
+      console.log('data', data);
+      this.peopleList = Object.keys(data).map(item => {
+        console.log(item)
+        return {
+          id: item,
+					...data[item]
+				}
+			})
+			this.showBlock = true
     }
 	},
 	computed: {
