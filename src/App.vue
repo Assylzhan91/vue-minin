@@ -67,11 +67,18 @@ export default  {
   },
   methods: {
  		async remove(id){
+ 		  this.showBlock = false
 	 		try {
+	 		  let foundPerson = this.peopleList.find( item => item.id === id).name;
 				await axios.delete(`${users}/${id}.json`)
-			 	this.peopleList = this.peopleList.filter(item=>item.id !== id)
+			 	this.peopleList = this.peopleList.filter(item=> item.id !== id)
+        this.alert = {
+          type: 'primary',
+          title: "This person os removed",
+          text: foundPerson,
+        }
 				if(!this.peopleList.length){
-				  throw new Error('asdasd ad ad asd as')
+				  throw new Error('All persons are removed, please add some persons')
 				}
        }catch (error) {
          this.alert = {
@@ -79,8 +86,8 @@ export default  {
            title: "Title Alert Error",
            text: error.message,
 				 }
-			 }
-
+		 	}
+      this.showBlock = true
 		},
     async createPerson (e) {
       this.showBlock = false
