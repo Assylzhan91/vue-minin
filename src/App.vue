@@ -1,6 +1,10 @@
 <template>
   <div id="app">
 		<div class="container">
+			<v-alert
+				:alert="alert"
+				@close="alert = null"
+			/>
 			<div class="card mt-5 p-5" v-if="showBlock">
 				<h1 class="h2 text-success">Data base</h1>
 				<form action="" @submit.prevent="createPerson">
@@ -38,13 +42,15 @@
 
 import PeopleList from './views/PeopleList';
 import VButton from './components/VButton';
+import VAlert from './components/VAlert';
 import { users } from './assets/js/urlList';
 import axios from 'axios';
 
 export default  {
   components: {
     PeopleList,
-    VButton
+    VButton,
+    VAlert
 	},
   data () {
     return {
@@ -53,17 +59,28 @@ export default  {
 			peopleList: [],
 			showBlock: false,
       errorBlock: false,
+      alert: null,
 		}
 	},
   created() {
 		this.loadedPersons();
   },
   methods: {
-     async remove(id){
-       this.showBlock = false
-       await axios.delete(`${users}/${id}.json`)
-			 this.peopleList = this.peopleList.filter(item=>item.id !== id)
-       this.showBlock = true
+ 		async remove(id){
+	 		try {
+				await axios.delete(`${users}/${id}.json`)
+			 	this.peopleList = this.peopleList.filter(item=>item.id !== id)
+				if(!this.peopleList.length){
+				  throw new Error('asdasd ad ad asd as')
+				}
+       }catch (error) {
+         this.alert = {
+           type: 'danger',
+           title: "Title Alert Error",
+           text: error.message,
+				 }
+			 }
+
 		},
     async createPerson (e) {
       this.showBlock = false
@@ -84,20 +101,33 @@ export default  {
 			})
 			this.name = ''
 			this.age = ''
+			this.alert = null;
       this.showBlock = true;
 		},
     loadPersons () {
-      console.log('loadPerson');
+      this.loadedPersons();
 		},
 		async loadedPersons () {
-      const { data } = await axios.get(users + '.json');
-      this.peopleList = Object.keys(data).map(item => {
-        return {
-          id: item,
-					...data[item]
+     	try {
+        const { data } = await axios.get(users + '.json');
+        if(!data){
+          throw new Error('Person list is empty');
+        }
+        this.peopleList = Object.keys(data).map(item => {
+          return {
+            id: item,
+            ...data[item]
+          }
+        })
+
+      }catch (error) {
+        this.alert = {
+          type: 'danger',
+          title: "Title Alert Error",
+          text: error.message,
 				}
-			})
-			this.showBlock = true
+			}
+      this.showBlock = true
     }
 	},
 	computed: {
