@@ -25,6 +25,7 @@
 					:list="peopleList"
 					textError="Not any person"
 					@load="loadPersons"
+					@remove="remove"
 				/>
 			</div>
 			<div v-if="errorBlock">
@@ -58,6 +59,12 @@ export default  {
 		this.loadedPersons();
   },
   methods: {
+     async remove(id){
+       this.showBlock = false
+       await axios.delete(`${users}/${id}.json`)
+			 this.peopleList = this.peopleList.filter(item=>item.id !== id)
+       this.showBlock = true
+		},
     async createPerson (e) {
       this.showBlock = false
       const requestOptions = {

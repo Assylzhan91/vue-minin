@@ -7,7 +7,7 @@
 				styleBtn="primary"
 				class="ms-sm-4"
 				clickHandler="delete"
-				@handler="deleteElem(item.id)"
+				@handler="$emit('remove', item.id)"
 			/>
 		</li>
 	</ul>
@@ -27,6 +27,7 @@
 import ErrorComponent from '../components/ErrorComponent';
 import VButton from '../components/VButton';
 import { users } from '../assets/js/urlList';
+import axios from 'axios';
 
 export default {
   name: "PeopleList",
@@ -52,13 +53,17 @@ export default {
 
 	},
 	methods: {
-		deleteElem(id) {
-		  this.showList = false;
-			fetch(`${users}/${id}.json`, {method: 'DELETE'})
-			.then(response => {
-			})
-      this.list.filter(i => i.id !== id)
-      this.showList = true;
+		async deleteElem(id) {
+      this.showList = false
+		  await axios.delete(`${users}/${id}.json`)
+			this.list = this.list.filter(item=> item.id !== id)
+      this.showList = true
+		  // this.showList = false;
+			// fetch(`${users}/${id}.json`, {method: 'DELETE'})
+			// .then(response => {
+			// })
+      // this.list.filter(i => i.id !== id)
+      // this.showList = true;
     },
 	},
 }
