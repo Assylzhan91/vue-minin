@@ -13,22 +13,19 @@
 						<input class="form-control" type="text" id="age" v-model.trim="age">
 						<h1>{{ age }}</h1>
 					</div>
-						<button
-							type="submit"
-							class="btn btn-primary"
-							:class="getLengthName"
-							:disabled="name.length < 4 || age.length <= 1"
-						>
-							Create a person
-						</button>
+					<v-button
+						text="Create a person"
+						styleBtn="success"
+						:class="getLengthName"
+						:disabled="name.length < 4 || age.length <= 1"
+						@handler="createPerson"
+					/>
 				</form>
-				<ul>
-					<li v-for="(item, id) of persons" :key="id">
-						<strong>{{ item.person.name }}</strong> - <b>{{ item.person.age }}</b>
-						<button class="m-4 btn btn-danger" @click="removeElem(item.id)">
-							Delete</button>
-					</li>
-				</ul>
+				<people-list
+					:list="peopleList"
+					textError="Not any person"
+					@load="loadPersons"
+				/>
 			</div>
 			<div v-if="errorBlock">
 				<h1>Error</h1>
@@ -37,38 +34,28 @@
   </div>
 </template>
 <script>
+
+import PeopleList from './views/PeopleList';
+import VButton from './components/VButton';
+import { users } from './assets/js/urlList';
+import axios from 'axios';
+
 export default  {
+  components: {
+    PeopleList,
+    VButton
+	},
   data () {
     return {
       name: '',
       age: '',
-			persons: [],
+			peopleList: [],
 			showBlock: false,
       errorBlock: false,
-			urlUsers: 'https://vue-http-481d2-default-rtdb.asia-southeast1.firebasedatabase.app/user.json',
 		}
 	},
   created() {
-		fetch('https://vue-http-481d2-default-rtdb.asia-southeast1.firebasedatabase.app/user.json')
-			.then(response => response.json())
-			.then(data => {
-			  console.log(data)
-        let obj = {};
-			  if(data !== null){
-          Object.entries(data).map((item, idx)=> {
-            this.persons[idx] = obj
-            this.persons[idx].id = item[0]
-            this.persons[idx].person = item[1]
-          })
-          console.log(this.persons)
-			  }
-        this.showBlock = true
-      })
-			.catch(error => {
-			  console.log(error)
-        // this.errorBlock = true
-			})
-
+		this.loadedPersons();
   },
   methods: {
     async createPerson (e) {
@@ -81,22 +68,26 @@ export default  {
           age: this.age,
 				})
       };
-      console.log(requestOptions);
-      const response =  await fetch(this.urlUsers, requestOptions);
+      const response =  await fetch(users + '.json', requestOptions);
       await response.json();
+      this.loadedPersons();
       this.showBlock = true;
 		},
-
-    async removeElem (id) {
-      const requestOptions = {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" }
-      };
-      const response = await fetch(this.urlUsers, requestOptions);
-      console.log(response)
-      const data = await response.json();
+    loadPersons () {
+      console.log('loadPerson');
 		},
-
+		async loadedPersons () {
+      const { data } = await axios.get(users + '.json');
+      console.log('data', data);
+      this.peopleList = Object.keys(data).map(item => {
+        console.log(item)
+        return {
+          id: item,
+					...data[item]
+				}
+			})
+			this.showBlock = true
+    }
 	},
 	computed: {
     getLengthName() {
