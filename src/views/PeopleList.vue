@@ -1,5 +1,5 @@
 <template>
-	<ul v-if="list.length">
+	<ul v-if="list.length && showList" >
 		<li v-for="(item) of list" :key="item.id">
 			<strong>{{ item.name }}</strong> - <b>{{ item.age }}</b>
 			<v-button
@@ -34,6 +34,9 @@ export default {
     ErrorComponent,
     VButton,
 	},
+	data: ()=>({
+    showList: true,
+	}),
 	emits: ['load'],
 	props: {
     list: {
@@ -45,11 +48,18 @@ export default {
       default: 'Error',
 		}
 	},
+	computed: {
+
+	},
 	methods: {
 		deleteElem(id) {
+		  this.showList = false;
 			fetch(`${users}/${id}.json`, {method: 'DELETE'})
-			.then(response => console.log(response));
-		}
-	}
+			.then(response => {
+			})
+      this.list.filter(i => i.id !== id)
+      this.showList = true;
+    },
+	},
 }
 </script>

@@ -17,7 +17,7 @@
 						text="Create a person"
 						styleBtn="success"
 						:class="getLengthName"
-						:disabled="name.length < 4 || age.length <= 1"
+						:disabled="getLengthName	"
 						@handler="createPerson"
 					/>
 				</form>
@@ -69,8 +69,14 @@ export default  {
 				})
       };
       const response =  await fetch(users + '.json', requestOptions);
-      await response.json();
-      this.loadedPersons();
+      const firebaseData = await response.json();
+      this.peopleList.push({
+				id: firebaseData.name,
+				name: this.name,
+				age: this.age,
+			})
+			this.name = ''
+			this.age = ''
       this.showBlock = true;
 		},
     loadPersons () {
@@ -78,9 +84,7 @@ export default  {
 		},
 		async loadedPersons () {
       const { data } = await axios.get(users + '.json');
-      console.log('data', data);
       this.peopleList = Object.keys(data).map(item => {
-        console.log(item)
         return {
           id: item,
 					...data[item]
